@@ -22,6 +22,7 @@ Montage-2D — движок перекладки (cutout / photo-collage stop-mo
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import math
 import os
@@ -235,15 +236,28 @@ def layer_state(layer, t, step, ctx):
 
     # речь: челюсть-хлопушка или подмена рта
     talk = layer.get("talk")
-    if talk and in_ranges(t, talk.get("ranges", [])):
-        tick = int(round(t * ctx.anim_fps))
-        rnd = random.Random(tick * 31 + sum(map(ord, layer.get("id", ""))))
-        # каждый третий шаг рот закрыт, остальные — случайная степень открытия
-        open_amt = rnd.choice([0.0, 0.6, 1.0, 1.0]) if tick % 3 != 0 else 0.0
-        if "open_asset" in talk and open_amt > 0.5:
-            asset_name = talk["open_asset"]
-        pos = [pos[0] + talk.get("dx", 0) * open_amt, pos[1] + talk.get("dy", 18) * open_amt]
-        rot = rot + talk.get("drot", 0) * open_amt
+    if talk:
+        open_amt = None
+        for e in talk.get("env", []):          # по громкости реальной реплики
+            if e["t0"] <= t < e["t1"]:
+                if e.get("vals"):
+                    i = min(int((t - e["t0"]) * ctx.anim_fps + 1e-6), len(e["vals"]) - 1)
+                    v = e["vals"][i]
+                    open_amt = 0.0 if v < 0.22 else (0.55 if v < 0.55 else 1.0)
+                else:
+                    open_amt = -1               # звука нет — случайная хлопушка
+        if open_amt is None and in_ranges(t, talk.get("ranges", [])):
+            open_amt = -1
+        if open_amt == -1:
+            tick = int(round(t * ctx.anim_fps))
+            rnd = random.Random(tick * 31 + sum(map(ord, layer.get("id", ""))))
+            # каждый третий шаг рот закрыт, остальные — случайная степень открытия
+            open_amt = rnd.choice([0.0, 0.6, 1.0, 1.0]) if tick % 3 != 0 else 0.0
+        if open_amt:
+            if "open_asset" in talk and open_amt > 0.5:
+                asset_name = talk["open_asset"]
+            pos = [pos[0] + talk.get("dx", 0) * open_amt, pos[1] + talk.get("dy", 18) * open_amt]
+            rot = rot + talk.get("drot", 0) * open_amt
 
     # «вскок» — появление с перелётом
     if "pop" in layer:
@@ -275,9 +289,15 @@ def camera_matrix(shot, t, ctx, step):
     zoom = sample_keys(keys, t, "zoom", cam.get("zoom", 1.0))
     center = sample_keys(keys, t, "center", cam.get("center", [W / 2, H / 2]))
     rot = sample_keys(keys, t, "rot", cam.get("rot", 0.0))
+    if cam.get("push"):      # медленный наезд за время плана: 0.08 = +8%
+        zoom *= 1 + cam["push"] * t / max(shot.get("dur", 1), 1e-6)
+    punches = [p for p in cam.get("punch", []) if t >= p["t"]]
+    for p in punches:        # снап-зум + короткая тряска
+        zoom *= p.get("zoom", 1.3)
+    cam_shake = list(cam.get("shake", [])) + [{"t": p["t"], "dur": 0.35, "amp": p.get("amp", 18)} for p in punches]
     # тряска: [{"t":2.0,"dur":0.4,"amp":25}]
     sx = sy = 0.0
-    for sh in cam.get("shake", []):
+    for sh in cam_shake:
         if sh["t"] <= t < sh["t"] + sh.get("dur", 0.4):
             rnd = random.Random(int(t * ctx.anim_fps) * 7919)
             fall = 1 - (t - sh["t"]) / sh.get("dur", 0.4)
@@ -357,6 +377,12 @@ def expand_rigs(scene):
                 talk["ranges"] = l["say"]
                 jaw["talk"] = talk
                 over["jaw"] = jaw
+            if "say_env" in l:   # из dialogue: челюсть по громкости аудио
+                jaw = dict(over.get("jaw", {}))
+                talk = dict(jaw.get("talk", rig.get("talk", {})))
+                talk["env"] = l["say_env"]
+                jaw["talk"] = talk
+                over["jaw"] = jaw
             if "face" in l:  # [{"t":1.0,"asset":"x_head_shock"}] — смена эмоции
                 head = dict(over.get("head", {}))
                 head["swap"] = l["face"]
@@ -376,6 +402,115 @@ def expand_rigs(scene):
                     part["parent"] = iid if par == root else f"{iid}.{par}"
                 out.append(part)
         shot["layers"] = out
+    return scene
+
+
+
+# --------------------------------------------------------------------------
+# Декорации и именованные камеры: расставили один раз — используем в каждом плане
+# --------------------------------------------------------------------------
+
+def expand_sets(scene):
+    sets, cams = scene.get("sets", {}), scene.get("cams", {})
+    for shot in scene["shots"]:
+        if "set" in shot:
+            base = copy.deepcopy(sets[shot["set"]])
+            over, hide = shot.get("with", {}), set(shot.get("hide", []))
+            base = [l for l in base if l.get("id") not in hide]
+            for l in base:
+                l.update(copy.deepcopy(over.get(l.get("id"), {})))
+            shot["layers"] = base + shot.get("layers", [])
+        shot.setdefault("layers", [])
+        if "cam" in shot:
+            cam = copy.deepcopy(cams[shot["cam"]])
+            cam.update(shot.get("camera", {}))
+            shot["camera"] = cam
+    return scene
+
+# --------------------------------------------------------------------------
+# Диалог: реплики → тайминг по аудио, субтитры, челюсти, звуковая дорожка
+# --------------------------------------------------------------------------
+
+def project_root(scene_path, scene):
+    return os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(scene_path)),
+                                         scene.get("project_root", "..")))
+
+
+def dialogue_path(scene_path, scene, si, li, line):
+    """Где лежит аудио реплики. Можно подменить файл своим дублем — имя то же."""
+    root = project_root(scene_path, scene)
+    if "file" in line:
+        return os.path.join(root, line["file"])
+    stem = os.path.splitext(os.path.basename(scene_path))[0]
+    return os.path.join(root, "audio", stem, f"s{si + 1:02d}_{li + 1:02d}_{line['who']}.wav")
+
+
+def analyze_audio(path, anim_fps):
+    """Длительность и огибающая громкости с шагом анимации (0..1)."""
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-f", "f32le", "-ac", "1",
+                          "-ar", "16000", "-"], capture_output=True).stdout
+    a = np.frombuffer(raw, dtype=np.float32)
+    if a.size == 0:
+        return 0.0, []
+    win = 16000 // anim_fps
+    n = int(math.ceil(a.size / win))
+    a = np.pad(a, (0, n * win - a.size))
+    rms = np.sqrt((a.reshape(n, win) ** 2).mean(axis=1))
+    ref = np.percentile(rms, 92) or 1.0
+    return a.size / 16000, np.clip(rms / ref, 0, 1).round(2).tolist()
+
+
+def expand_dialogue(scene, scene_path):
+    cast = scene.get("cast", {})
+    fps_a = scene.get("anim_fps", 12)
+    scene.setdefault("audio", [])
+    shot_start = 0.0
+    for si, shot in enumerate(scene["shots"]):
+        lines = shot.get("dialogue", [])
+        cursor = shot.get("lead", 0.3)
+        caps = []
+        for li, line in enumerate(lines):
+            who = line["who"]
+            c = cast.get(who, {})
+            path = dialogue_path(scene_path, scene, si, li, line)
+            if os.path.exists(path):
+                dur, vals = analyze_audio(path, fps_a)
+            else:  # аудио ещё нет — оцениваем по числу слогов (немой аниматик)
+                syl = sum(ch in "аеёиоуыэюяaeiouy" for ch in line["text"].lower())
+                dur, vals = max(0.5, syl * 0.17), None
+            t0 = line.get("t", cursor + line.get("gap", 0.2))
+            t1 = t0 + dur
+            cursor = t1
+            if caps:
+                caps[-1]["t"][1] = min(caps[-1]["t"][1], t0)
+            if not line.get("nocap"):
+                caps.append({"t": [t0, t1 + 0.45], "who": c.get("name", ""), "text": line["text"],
+                             "who_color": c.get("color", [255, 214, 0]),
+                             **({"color": c["text_color"]} if "text_color" in c else {})})
+            if line.get("punch"):   # наезд-удар камеры на реплике
+                z = line["punch"] if isinstance(line["punch"], (int, float)) and line["punch"] is not True else 1.3
+                shot.setdefault("camera", {}).setdefault("punch", []).append({"t": t0, "zoom": z})
+            if vals is not None:
+                scene["audio"].append({"file": path, "start": shot_start + t0,
+                                       "volume": line.get("volume", c.get("volume", 1.0))})
+            for l in shot.get("layers", []):
+                if l.get("id") == who and "rig" in l:
+                    l.setdefault("say_env", []).append({"t0": t0, "t1": t1, "vals": vals})
+                    if "face" in line:
+                        l.setdefault("face", []).append({"t": t0, "asset": line["face"]})
+                for rid, asset in line.get("react", {}).items():   # реакции слушающих
+                    if l.get("id") == rid and "rig" in l:
+                        l.setdefault("face", []).append({"t": line.get("react_t", t0), "asset": asset})
+        for l in shot.get("layers", []):
+            if "face" in l:
+                l["face"].sort(key=lambda f: f["t"])
+        shot.setdefault("captions", []).extend(caps)
+        if shot.get("dur", "auto") == "auto":
+            shot["dur"] = round(cursor + shot.get("tail", 0.6), 3)
+        for fx in shot.get("sfx", []):
+            scene["audio"].append({"file": os.path.join(project_root(scene_path, scene), fx["file"]),
+                                   "start": shot_start + fx.get("t", 0), "volume": fx.get("volume", 1.0)})
+        shot_start += shot["dur"]
     return scene
 
 # --------------------------------------------------------------------------
@@ -424,20 +559,30 @@ def draw_caption(canvas, cap, ctx):
                stroke_width=st.get("stroke", 7), stroke_fill=(0, 0, 0))
 
 
+MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
+
+
 def draw_title_card(canvas, card, ctx, t):
-    """Плашка-гэг на весь экран: «3 ЧАСА СПУСТЯ», «ТОКЕНОВ: 0»."""
+    """Плашка-гэг («3 ЧАСА СПУСТЯ») или экран ноутбука ("mono": true, "align": "left")."""
+    if "t" in card and not (card["t"][0] <= t < card["t"][1]):
+        return
     W, H = ctx.W, ctx.H
-    bg = tuple(card.get("bg", [20, 20, 20])) + (255,)
-    over = Image.new("RGBA", (W, H), bg)
+    over = Image.new("RGBA", (W, H), tuple(card.get("bg", [20, 20, 20])) + (255,))
     d = ImageDraw.Draw(over)
     size = card.get("size", 120)
-    fnt = font(ctx.font_path, size)
-    lines = wrap(d, card["text"], fnt, W - 140)
-    total = len(lines) * size * 1.2
+    fnt = font(MONO if card.get("mono") else ctx.font_path, size)
+    text = card["text"]
+    if "type" in card:  # эффект печати: символов в секунду
+        text = text[: int(max(0, t - card.get("type_from", 0)) * card["type"])]
+    lines = []
+    for para in text.split("\n"):
+        lines += wrap(d, para, fnt, W - 140) or [""]
+    lh = size * 1.25
+    y = card.get("y", (H - len(lines) * lh) / 2 - (120 if card.get("mono") else 0))
     for i, line in enumerate(lines):
         tw = d.textlength(line, font=fnt)
-        d.text(((W - tw) / 2, (H - total) / 2 + i * size * 1.2), line, font=fnt,
-               fill=tuple(card.get("color", [255, 255, 255])))
+        x = 70 if card.get("align") == "left" else (W - tw) / 2
+        d.text((x, y + i * lh), line, font=fnt, fill=tuple(card.get("color", [255, 255, 255])))
     canvas.alpha_composite(over)
 
 
@@ -491,11 +636,11 @@ def render_frame(scene, ctx, post, t_global):
         if layer.get("shadow", True) and asset.pad:
             blit(canvas, asset.shadow, m_translate(*sh_off) @ full)
         blit(canvas, asset.img, full)
+    if "card" in shot:
+        draw_title_card(canvas, shot["card"], ctx, t)
     for cap in shot.get("captions", []):
         if cap["t"][0] <= t < cap["t"][1]:
             draw_caption(canvas, cap, ctx)
-    if "card" in shot:
-        draw_title_card(canvas, shot["card"], ctx, t)
     return post.apply(canvas, step)
 
 
@@ -510,7 +655,8 @@ def build_audio_args(scene, root, total):
         vol = a.get("volume", 1.0)
         filters.append(f"[{i + 1}:a]adelay={ms}|{ms},volume={vol}[a{i}]")
         labels.append(f"[a{i}]")
-    filters.append("".join(labels) + f"amix=inputs={len(labels)}:normalize=0,atrim=0:{total}[aout]")
+    filters.append("".join(labels) + f"amix=inputs={len(labels)}:normalize=0,atrim=0:{total},"
+                   "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout]")
     return inputs, ["-filter_complex", ";".join(filters), "-map", "0:v", "-map", "[aout]",
                     "-c:a", "aac", "-b:a", "192k"]
 
@@ -524,7 +670,7 @@ def main():
     args = ap.parse_args()
 
     with open(args.scene, encoding="utf-8") as f:
-        scene = expand_rigs(json.load(f))
+        scene = expand_rigs(expand_dialogue(expand_sets(json.load(f)), args.scene))
     root = os.path.dirname(os.path.abspath(args.scene))
     root = os.path.join(root, scene.get("asset_root", "."))
     W, H = scene.get("size", [1080, 1920])

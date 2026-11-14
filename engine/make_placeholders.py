@@ -61,6 +61,28 @@ d.rectangle([950, 1900, 980, 2100], fill=(110, 80, 50))
 photoize(bg, 9, 1.2).save(os.path.join(OUT, "bg_living.png"))
 
 
+
+# ---------------- фон: кухня (конфессионал) ----------------
+kb = Image.new("RGB", (W, H))
+d = ImageDraw.Draw(kb)
+shade(d, (0, 0, W, 1700), (214, 205, 170), (180, 170, 135))           # стена
+for x in range(0, W, 140):                                             # плитка
+    d.line([x, 900, x, 1700], fill=(165, 158, 128), width=4)
+for y in range(900, 1700, 140):
+    d.line([0, y, W, y], fill=(165, 158, 128), width=4)
+shade(d, (0, 1700, W, H), (110, 100, 90), (70, 62, 56))               # пол
+d.rounded_rectangle([820, 420, 1320, 2050], 30, fill=(232, 232, 226)) # холодильник
+d.line([820, 1050, 1320, 1050], fill=(170, 170, 165), width=10)
+d.rectangle([850, 700, 875, 980], fill=(150, 150, 150))
+for cx, cy, col in ((960, 560, (230, 60, 60)), (1100, 640, (60, 140, 230)), (1220, 540, (250, 200, 40))):
+    d.ellipse([cx - 28, cy - 28, cx + 28, cy + 28], fill=col)          # магниты
+d.rectangle([940, 760, 1240, 900], fill=(255, 245, 150))               # стикер
+d.line([950, 770, 1230, 890], fill=(210, 40, 40), width=10)
+d.rectangle([60, 300, 520, 820], fill=(150, 190, 220))                 # окно
+d.rectangle([50, 290, 530, 830], outline=(240, 236, 228), width=18)
+d.rectangle([0, 1380, 760, 1460], fill=(120, 96, 70))                  # столешница
+photoize(kb, 9, 1.2).save(os.path.join(OUT, "bg_kitchen.png"))
+
 # ---------------- персонаж ----------------
 def character(prefix, hoodie, skin, hair, glasses=False, cap=False):
     # тело

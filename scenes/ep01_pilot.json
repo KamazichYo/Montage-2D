@@ -1,0 +1,144 @@
+{
+  "title": "Э1. «Вы абсолютно правы» — пилот (аниматик на болванках)",
+  "size": [1080, 1920],
+  "fps": 24,
+  "anim_fps": 12,
+  "asset_root": "../assets/demo",
+  "style": {
+    "edge": 7, "boil": 1.6, "camera_boil": 1.2,
+    "shadow_blur": 10, "shadow_offset": [12, 16], "shadow_opacity": 0.5,
+    "grain": 7, "flicker": 0.03, "vignette": 0.3,
+    "captions": { "size": 58, "y": 1450, "stroke": 7 }
+  },
+  "cast": {
+    "g": { "name": "ГОША",  "color": [255, 160, 60],  "voice": { "piper": "dmitri", "speed": 1.15, "pitch": 1.08 } },
+    "l": { "name": "ЛЁВА",  "color": [130, 220, 160], "voice": { "piper": "ruslan", "speed": 1.0,  "pitch": 0.95 } },
+    "k": { "name": "КЛАВА", "color": [120, 200, 255], "text_color": [200, 235, 255],
+           "voice": { "piper": "irina", "speed": 1.08, "fx": "robot" } }
+  },
+  "assets": {
+    "bg_living": { "file": "bg_living.png", "bg": true },
+    "bg_kitchen": { "file": "bg_kitchen.png", "bg": true },
+    "gosha_body": "gosha_body.png", "gosha_arm": "gosha_arm.png", "gosha_jaw": "gosha_jaw.png",
+    "gosha_head_neutral": "gosha_head_neutral.png", "gosha_head_shock": "gosha_head_shock.png", "gosha_head_smug": "gosha_head_smug.png",
+    "lyova_body": "lyova_body.png", "lyova_arm": "lyova_arm.png", "lyova_jaw": "lyova_jaw.png",
+    "lyova_head_neutral": "lyova_head_neutral.png", "lyova_head_shock": "lyova_head_shock.png", "lyova_head_smug": "lyova_head_smug.png",
+    "laptop": "prop_laptop.png", "can": "prop_can.png"
+  },
+  "rigs": {
+    "gosha": {
+      "talk": { "dy": 22 },
+      "parts": [
+        { "part": "arm_back", "asset": "gosha_arm", "at": [0.86, 0.14], "anchor": [0.5, 0.06], "rot": -14, "z": -1 },
+        { "part": "body", "asset": "gosha_body", "anchor": [0.5, 1.0], "root": true },
+        { "part": "jaw", "asset": "gosha_jaw", "parent": "head", "at": [0.5, 0.97], "anchor": [0.5, 0.02], "z": 1 },
+        { "part": "head", "asset": "gosha_head_neutral", "at": [0.5, 0.02], "anchor": [0.5, 1.0], "pos": [0, -70], "z": 2 },
+        { "part": "arm", "asset": "gosha_arm", "at": [0.14, 0.14], "anchor": [0.5, 0.06], "rot": 14, "z": 3 }
+      ]
+    },
+    "lyova": {
+      "talk": { "dy": 18 },
+      "parts": [
+        { "part": "arm_back", "asset": "lyova_arm", "at": [0.86, 0.14], "anchor": [0.5, 0.06], "rot": -8, "z": -1 },
+        { "part": "body", "asset": "lyova_body", "anchor": [0.5, 1.0], "root": true },
+        { "part": "jaw", "asset": "lyova_jaw", "parent": "head", "at": [0.5, 0.97], "anchor": [0.5, 0.02], "z": 1 },
+        { "part": "head", "asset": "lyova_head_neutral", "at": [0.5, 0.02], "anchor": [0.5, 1.0], "pos": [0, -70], "z": 2 },
+        { "part": "arm", "asset": "lyova_arm", "at": [0.14, 0.14], "anchor": [0.5, 0.06], "rot": 8, "z": 3 }
+      ]
+    }
+  },
+  "sets": {
+    "living": [
+      { "id": "bg", "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+      { "id": "g", "rig": "gosha", "pos": [320, 1600], "scale": 0.72, "z": 10 },
+      { "id": "laptop", "asset": "laptop", "pos": [330, 1640], "scale": 0.7, "anchor": [0.5, 1.0], "z": 11 },
+      { "id": "l", "rig": "lyova", "pos": [800, 1780], "scale": 0.86, "z": 9, "flip": true }
+    ],
+    "kitchen": [
+      { "id": "bg", "asset": "bg_kitchen", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+      { "id": "l", "rig": "lyova", "pos": [470, 1900], "scale": 1.25, "z": 9 }
+    ]
+  },
+  "cams": {
+    "wide":  { "zoom": 1.0,  "center": [540, 1000], "push": 0.06 },
+    "cu_g":  { "zoom": 1.9,  "center": [320, 1060], "push": 0.04 },
+    "cu_l":  { "zoom": 2.0,  "center": [800, 1150], "push": 0.04 },
+    "talk":  { "zoom": 1.05, "center": [520, 1010], "push": 0.05 }
+  },
+  "shots": [
+    { "name": "01 общий — завязка", "set": "living", "cam": "wide",
+      "with": { "g": { "face": [ { "t": 0, "asset": "gosha_head_smug" } ] } },
+      "dialogue": [
+        { "who": "g", "text": "Лёва! Я за вечер сделал стартап." },
+        { "who": "g", "text": "Без единой строчки кода!", "punch": 1.15 }
+      ] },
+
+    { "name": "02 крупный Лёва", "set": "living", "cam": "cu_l",
+      "dialogue": [ { "who": "l", "text": "А тесты?" } ] },
+
+    { "name": "03 крупный Гоша — пауза", "set": "living", "cam": "cu_g", "lead": 0.9, "tail": 0.9,
+      "with": { "g": { "face": [ { "t": 0, "asset": "gosha_head_smug" }, { "t": 0.5, "asset": "gosha_head_neutral" } ] } },
+      "dialogue": [ { "who": "g", "text": "…Какие тесты?", "say": "Какие тесты?", "punch": 1.2 } ] },
+
+    { "name": "04 экран — запрос", "fill": [18, 22, 28],
+      "card": { "text": "> напиши тесты.\n> много.", "mono": true, "align": "left", "size": 64, "bg": [18, 22, 28], "color": [120, 255, 140], "type": 22 },
+      "dialogue": [ { "who": "g", "text": "Клава, напиши тесты. Много." } ] },
+
+    { "name": "05 экран — ответ", "fill": [18, 22, 28],
+      "card": { "text": "✓ 200 тестов\n✓ 200 пройдено\n✓ 0 ошибок", "mono": true, "align": "left", "size": 72, "bg": [18, 22, 28], "color": [120, 255, 140], "type": 30 },
+      "dialogue": [ { "who": "k", "text": "Отличная идея! Готово. Двести тестов. Все зелёные!" } ] },
+
+    { "name": "06 экран — что внутри", "dur": 1.5, "fill": [18, 22, 28],
+      "card": { "text": "def test_1():\n  assert True\n\ndef test_2():\n  assert True\n\ndef test_3():\n  assert True\n\n# ...ещё 197", "mono": true, "align": "left", "size": 60, "bg": [18, 22, 28], "color": [230, 230, 230] } },
+
+    { "name": "07 крупный Лёва — разбор", "set": "living", "cam": "cu_l",
+      "dialogue": [ { "who": "l", "text": "Гоша. Они проверяют, что правда — это правда." } ] },
+
+    { "name": "08 крупный Гоша — гордость", "set": "living", "cam": "cu_g",
+      "with": { "g": { "face": [ { "t": 0, "asset": "gosha_head_smug" } ] } },
+      "dialogue": [ { "who": "g", "text": "И ни одной ошибки!", "punch": 1.15 } ] },
+
+    { "name": "09 общий — аффирмации", "set": "living", "cam": "talk",
+      "dialogue": [
+        { "who": "l", "text": "Это не тесты. Это аффирмации.", "react": { "g": "gosha_head_neutral" } },
+        { "who": "g", "text": "Ладно! Клава, сделай по-настоящему.", "gap": 0.35 }
+      ] },
+
+    { "name": "10 экран — Клава права", "fill": [18, 22, 28],
+      "card": { "text": "Клава думает…", "mono": true, "size": 64, "bg": [18, 22, 28], "color": [120, 200, 255], "type": 14 },
+      "dialogue": [ { "who": "k", "text": "Вы абсолютно правы! Настоящие тесты нашли настоящую проблему." } ] },
+
+    { "name": "11 крупный Гоша — вопрос", "set": "living", "cam": "cu_g", "tail": 0.3,
+      "dialogue": [ { "who": "g", "text": "Какую?" } ] },
+
+    { "name": "12 экран — удалила", "fill": [18, 22, 28], "tail": 0.5,
+      "card": { "text": "$ DROP DATABASE prod;\n\n✓ готово", "mono": true, "align": "left", "size": 64, "bg": [18, 22, 28], "color": [255, 110, 110], "type": 26 },
+      "dialogue": [ { "who": "k", "text": "Базу данных. Я её удалила." } ] },
+
+    { "name": "13 крупный Гоша — шок", "set": "living", "cam": "cu_g", "lead": 0.15, "tail": 0.5,
+      "with": { "g": { "face": [ { "t": 0, "asset": "gosha_head_shock" } ] },
+                "laptop": { "keys": [ { "t": 0, "rot": 0 }, { "t": 0.3, "rot": -18, "ease": "back" } ] } },
+      "dialogue": [ { "who": "g", "text": "ЗАЧЕМ?!", "say": "Зачем?!", "punch": 1.35 } ] },
+
+    { "name": "14 общий — логика Клавы", "set": "living", "cam": "wide",
+      "with": { "g": { "face": [ { "t": 0, "asset": "gosha_head_shock" } ] } },
+      "dialogue": [
+        { "who": "k", "text": "Нет базы — нет ошибок." },
+        { "who": "k", "text": "Все тесты зелёные!", "react": { "l": "lyova_head_smug" }, "gap": 0.3 }
+      ] },
+
+    { "name": "15 кухня — конфессионал", "set": "kitchen", "camera": { "zoom": 1.0, "center": [540, 960], "push": 0.07 },
+      "dialogue": [
+        { "who": "l", "text": "Самое страшное — она извинилась." },
+        { "who": "l", "text": "Искренне. Мой тимлид так не умел.", "gap": 0.45, "face": "lyova_head_smug" }
+      ] },
+
+    { "name": "16 плашка — итоги", "tail": 0.8,
+      "card": { "text": "ПОЛЬЗОВАТЕЛЕЙ: 0\nБАГОВ: 0\nMRR: $0", "bg": [200, 30, 30], "size": 80, "type": 18 },
+      "dialogue": [ { "who": "g", "text": "Зато теперь ноль багов!", "t": 1.6 } ] },
+
+    { "name": "17 добивка", "tail": 0.7,
+      "card": { "text": "основано на\nреальных событиях", "bg": [12, 12, 12], "size": 64, "color": [200, 200, 200] },
+      "dialogue": [ { "who": "k", "text": "Могу ещё чем-нибудь помочь?" } ] }
+  ]
+}

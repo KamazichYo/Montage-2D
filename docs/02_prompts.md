@@ -2,6 +2,8 @@
 
 Где генерировать: **Gemini app** (режим изображений, «Thinking»/Pro-модель), **Google Flow** или **AI Studio** — везде, где есть Nano Banana Pro. Промты на английском: модель так точнее держит детали. Пояснения — на русском.
 
+> **Для пилота нужно всего 11 картинок** — список в [`04_pilot_script.md`](04_pilot_script.md). Остальное в этом файле — на вырост.
+
 ## Порядок работы (важно для одинаковых лиц)
 
 1. **Сначала — лист-референс (turnaround)** каждого героя. Выбираем лучший вариант. Это «паспорт» персонажа.
@@ -197,7 +199,7 @@ furniture, same objects, same lighting and time of day, NO people, vertical
 | G4 | `medium close shot of the sofa from the front, coffee table with pizza boxes in the foreground` |
 | G5 | `the small kitchen corner: old fridge covered with magnets and a sticker "НЕ ДЕПЛОИТЬ В ПЯТНИЦУ" crossed out, a kettle, a window` — это фон для конфессионалов |
 | G6 | `the narrow hallway with the front door, a coat rack, a pile of sneakers and delivery bags` |
-| G7 | `close-up of the laptop screen on the desk, the screen is plain dark grey and empty` — сюда я накладываю текст чата с агентом |
+| G7 | `close-up of the laptop screen on the desk, the screen is plain dark grey and empty` — фон для чата с Клавой; сам текст рисует движок |
 | G8 | `view out of the window: Soviet panel buildings, [night with lit windows / early morning sunrise]` |
 
 ### G-ext. Экстерьер (заставка серии)

@@ -1,17 +1,23 @@
-# Montage-2D — мемный ситком в стиле фото-перекладки
+# Montage-2D — «Навайбкодили»
 
-Вертикальные рилсы на 60–90 секунд про двух корешей-вайбкодеров. Персонажи и квартира — сгенерированные фотографии, вырезанные и переложенные покадрово (cutout / photo-collage stop-motion).
+Мемный ситком в стиле фото-перекладки: вертикальные ролики на 45–75 секунд про двух соседей-вайбкодеров и ИИ-агента Клаву. Герои и квартира — сгенерированные фотографии, вырезанные и переложенные покадрово.
 
-- [`docs/01_show_bible.md`](docs/01_show_bible.md) — концепция, персонажи, квартира, структура серии, 12 сюжетов
-- [`docs/02_prompts.md`](docs/02_prompts.md) — промты Nano Banana Pro: листы-референсы, эмоции, развёртки, фоны, реквизит
-- [`docs/03_tools_pipeline.md`](docs/03_tools_pipeline.md) — пайплайн, скиллы, инструменты, как передавать материалы
+| Документ | Что внутри |
+|---|---|
+| [`docs/01_show_bible.md`](docs/01_show_bible.md) | Концепция, герои, визуальный язык, структура серии, рубрики, 12 сюжетов, выпуск |
+| [`docs/02_prompts.md`](docs/02_prompts.md) | Промты для Nano Banana Pro: герои, эмоции, развёртки, квартира, реквизит |
+| [`docs/03_tools_pipeline.md`](docs/03_tools_pipeline.md) | Пайплайн и все инструменты по этапам — что проверено, что нужно подключить |
+| [`docs/04_pilot_script.md`](docs/04_pilot_script.md) | Сценарий пилота и список картинок, которые для него нужны |
+| [`.claude/skills/montage-episode/SKILL.md`](.claude/skills/montage-episode/SKILL.md) | Скилл: как собирать серию и формат сцены |
 
 ## Быстрый старт
 
 ```bash
-pip install pillow numpy scipy rembg onnxruntime   # + ffmpeg в системе
-python3 engine/make_placeholders.py assets/demo    # болванки для теста
-python3 engine/cutout.py scenes/demo.json -o out/demo.mp4
+pip install pillow numpy scipy rembg onnxruntime piper-tts    # + ffmpeg в системе
+
+python3 engine/make_placeholders.py assets/demo               # болванки
+python3 engine/voice.py scenes/ep01_pilot.json                # черновая озвучка (скачает голоса)
+python3 engine/cutout.py scenes/ep01_pilot.json -o out/ep01.mp4
 ```
 
 Вырезать сгенерированные картинки:
@@ -21,24 +27,9 @@ python3 engine/cut.py incoming/gosha/gosha_parts.png -o assets/chars/gosha --spl
 python3 engine/jaw.py assets/chars/gosha/gosha_head_neutral.png --mouth 0.74
 ```
 
-## Формат сцены (коротко)
+Сцена пишется репликами — длительность планов, субтитры и движение челюсти берутся из аудио:
 
 ```jsonc
-{
-  "assets": { "bg_living": {"file": "bg.png", "bg": true}, "gosha_body": "gosha_body.png" },
-  "rigs":   { "gosha": { "parts": [ {"part": "body", "root": true, ...}, {"part": "head", "at": [0.5, 0.02], ...} ] } },
-  "shots": [
-    { "dur": 2.4,
-      "camera": { "keys": [{"t": 0, "zoom": 1.9, "center": [320, 1060]}, {"t": 1.0, "zoom": 2.6, "ease": "step"}],
-                  "shake": [{"t": 1.0, "dur": 0.4, "amp": 22}] },
-      "layers": [
-        { "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0 },
-        { "rig": "gosha", "pos": [320, 1600], "scale": 0.72,
-          "face": [{"t": 1.0, "asset": "gosha_head_shock"}],   // смена эмоции
-          "say":  [[1.1, 2.1]] }                                // челюсть хлопает
-      ],
-      "captions": [{ "t": [1.1, 2.4], "who": "ГОША", "text": "...какие тесты?" }] }
-  ],
-  "audio": [{ "file": "audio/line1.wav", "start": 1.1 }]
-}
+{ "set": "living", "cam": "cu_g",
+  "dialogue": [ { "who": "g", "text": "ЗАЧЕМ?!", "face": "gosha_head_shock", "punch": 1.35 } ] }
 ```
