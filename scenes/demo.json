@@ -1,0 +1,123 @@
+{
+  "title": "Демо: «Ты абсолютно прав»",
+  "size": [1080, 1920],
+  "fps": 24,
+  "anim_fps": 12,
+  "asset_root": "../assets/demo",
+  "style": {
+    "edge": 7,
+    "boil": 1.6,
+    "camera_boil": 1.2,
+    "shadow_blur": 10,
+    "shadow_offset": [12, 16],
+    "shadow_opacity": 0.5,
+    "grain": 7,
+    "flicker": 0.03,
+    "vignette": 0.3,
+    "captions": { "size": 60, "y": 1470, "stroke": 7 }
+  },
+  "assets": {
+    "bg_living": { "file": "bg_living.png", "bg": true },
+    "gosha_body": "gosha_body.png",
+    "gosha_arm": "gosha_arm.png",
+    "gosha_head_neutral": "gosha_head_neutral.png",
+    "gosha_head_shock": "gosha_head_shock.png",
+    "gosha_head_smug": "gosha_head_smug.png",
+    "gosha_jaw": "gosha_jaw.png",
+    "lyova_body": "lyova_body.png",
+    "lyova_arm": "lyova_arm.png",
+    "lyova_head_neutral": "lyova_head_neutral.png",
+    "lyova_head_shock": "lyova_head_shock.png",
+    "lyova_head_smug": "lyova_head_smug.png",
+    "lyova_jaw": "lyova_jaw.png",
+    "laptop": "prop_laptop.png",
+    "can": "prop_can.png"
+  },
+  "rigs": {
+    "gosha": {
+      "talk": { "dy": 22, "drot": 0 },
+      "parts": [
+        { "part": "arm_back", "asset": "gosha_arm", "at": [0.86, 0.14], "anchor": [0.5, 0.06], "rot": -14, "z": -1 },
+        { "part": "body", "asset": "gosha_body", "anchor": [0.5, 1.0], "root": true },
+        { "part": "jaw", "asset": "gosha_jaw", "parent": "head", "at": [0.5, 0.97], "anchor": [0.5, 0.02], "z": 1 },
+        { "part": "head", "asset": "gosha_head_neutral", "at": [0.5, 0.02], "anchor": [0.5, 1.0], "pos": [0, -70], "z": 2 },
+        { "part": "arm", "asset": "gosha_arm", "at": [0.14, 0.14], "anchor": [0.5, 0.06], "rot": 14, "z": 3 }
+      ]
+    },
+    "lyova": {
+      "talk": { "dy": 18, "drot": 0 },
+      "parts": [
+        { "part": "arm_back", "asset": "lyova_arm", "at": [0.86, 0.14], "anchor": [0.5, 0.06], "rot": -8, "z": -1 },
+        { "part": "body", "asset": "lyova_body", "anchor": [0.5, 1.0], "root": true },
+        { "part": "jaw", "asset": "lyova_jaw", "parent": "head", "at": [0.5, 0.97], "anchor": [0.5, 0.02], "z": 1 },
+        { "part": "head", "asset": "lyova_head_neutral", "at": [0.5, 0.02], "anchor": [0.5, 1.0], "pos": [0, -70], "z": 2 },
+        { "part": "arm", "asset": "lyova_arm", "at": [0.14, 0.14], "anchor": [0.5, 0.06], "rot": 8, "z": 3 }
+      ]
+    }
+  },
+  "shots": [
+    {
+      "name": "1. Общий план — завязка",
+      "dur": 3.5,
+      "camera": { "keys": [ { "t": 0, "zoom": 1.0, "center": [540, 1000] }, { "t": 3.5, "zoom": 1.12, "center": [520, 1060] } ] },
+      "layers": [
+        { "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+        { "rig": "gosha", "id": "g", "pos": [320, 1600], "scale": 0.72, "z": 10,
+          "say": [[0.2, 2.2]], "face": [ { "t": 0, "asset": "gosha_head_smug" } ] },
+        { "asset": "laptop", "pos": [330, 1640], "scale": 0.7, "anchor": [0.5, 1.0], "z": 11 },
+        { "rig": "lyova", "id": "l", "pos": [800, 1780], "scale": 0.86, "z": 9, "flip": true },
+        { "asset": "can", "pos": [700, 1560], "scale": 0.6, "anchor": [0.5, 1.0], "z": 12, "pop": 2.6 }
+      ],
+      "captions": [ { "t": [0.2, 3.5], "who": "ГОША", "text": "Я за вечер навайбкодил стартап. Без единой строчки." } ]
+    },
+    {
+      "name": "2. Крупный — Лёва",
+      "dur": 2.4,
+      "camera": { "keys": [ { "t": 0, "zoom": 2.0, "center": [800, 1150] }, { "t": 2.4, "zoom": 2.1, "center": [800, 1150] } ] },
+      "layers": [
+        { "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+        { "rig": "lyova", "id": "l", "pos": [800, 1780], "scale": 0.86, "z": 9, "flip": true,
+          "say": [[0.3, 1.6]], "parts": { "arm": { "keys": [ { "t": 0, "rot": 8 }, { "t": 0.6, "rot": 150, "ease": "back" } ] } } }
+      ],
+      "captions": [ { "t": [0.3, 2.4], "who": "ЛЁВА", "text": "А тесты?" } ]
+    },
+    {
+      "name": "3. Крупный — Гоша, наезд",
+      "dur": 2.4,
+      "camera": { "keys": [ { "t": 0, "zoom": 1.9, "center": [320, 1060] }, { "t": 0.9, "zoom": 1.9, "center": [320, 1060] }, { "t": 1.0, "zoom": 2.6, "center": [320, 1000], "ease": "step" } ],
+                  "shake": [ { "t": 1.0, "dur": 0.4, "amp": 22 } ] },
+      "layers": [
+        { "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+        { "rig": "gosha", "id": "g", "pos": [320, 1600], "scale": 0.72, "z": 10,
+          "face": [ { "t": 0, "asset": "gosha_head_neutral" }, { "t": 1.0, "asset": "gosha_head_shock" } ], "say": [[1.1, 2.1]] },
+        { "asset": "laptop", "pos": [330, 1640], "scale": 0.7, "anchor": [0.5, 1.0], "z": 11 }
+      ],
+      "captions": [ { "t": [1.1, 2.4], "who": "ГОША", "text": "...какие тесты?" } ]
+    },
+    {
+      "name": "4. Плашка",
+      "dur": 1.4,
+      "card": { "text": "ПЯТНИЦА. 23:58. ДЕПЛОЙ В ПРОД.", "bg": [200, 30, 30], "size": 110 },
+      "layers": []
+    },
+    {
+      "name": "5. Общий — добивка от агента",
+      "dur": 4.0,
+      "camera": { "keys": [ { "t": 0, "zoom": 1.05, "center": [540, 1050] }, { "t": 4.0, "zoom": 1.0, "center": [540, 1000] } ],
+                  "shake": [ { "t": 2.2, "dur": 0.5, "amp": 14 } ] },
+      "layers": [
+        { "asset": "bg_living", "pos": [540, 960], "scale": 0.82, "boil": 0, "shadow": false, "z": 0 },
+        { "rig": "gosha", "id": "g", "pos": [320, 1600], "scale": 0.72, "z": 10,
+          "face": [ { "t": 0, "asset": "gosha_head_neutral" }, { "t": 2.2, "asset": "gosha_head_shock" } ] },
+        { "asset": "laptop", "pos": [330, 1640], "scale": 0.7, "anchor": [0.5, 1.0], "z": 11,
+          "keys": [ { "t": 0, "rot": 0 }, { "t": 2.2, "rot": 0 }, { "t": 2.5, "rot": -18, "ease": "back" } ] },
+        { "rig": "lyova", "id": "l", "pos": [800, 1780], "scale": 0.86, "z": 9, "flip": true,
+          "face": [ { "t": 0, "asset": "lyova_head_neutral" }, { "t": 2.4, "asset": "lyova_head_smug" } ] }
+      ],
+      "captions": [
+        { "t": [0.2, 2.2], "who": "АГЕНТ", "who_color": [120, 255, 140], "text": "Вы абсолютно правы! Я удалил базу данных." },
+        { "t": [2.4, 4.0], "who": "", "text": "[закадровый смех]", "color": [255, 230, 120], "size": 52 }
+      ]
+    }
+  ]
+}
