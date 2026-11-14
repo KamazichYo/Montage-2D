@@ -9,6 +9,7 @@
 | [`docs/03_tools_pipeline.md`](docs/03_tools_pipeline.md) | Пайплайн и все инструменты по этапам — что проверено, что нужно подключить |
 | [`docs/04_pilot_script.md`](docs/04_pilot_script.md) | Сценарий пилота и список картинок, которые для него нужны |
 | [`docs/05_prompt_pack.md`](docs/05_prompt_pack.md) | Готовые промты для первого видео: локации, герои, гости, реквизит |
+| [`docs/06_pilot_outside.md`](docs/06_pilot_outside.md) | Новый пилот «Выйти из Матрицы»: сценарий, рамка сериала, список персонажей |
 | [`.claude/skills/montage-episode/SKILL.md`](.claude/skills/montage-episode/SKILL.md) | Скилл: как собирать серию и формат сцены |
 
 ## Быстрый старт
