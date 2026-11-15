@@ -34,7 +34,8 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 
 import numpy as np
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from scipy import ndimage
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 # --------------------------------------------------------------------------
 # Математика 2D-аффинных матриц (3x3)
@@ -71,6 +72,7 @@ EASES = {
     "inout": lambda x: 3 * x * x - 2 * x * x * x,
     "back": _back_out,  # перелёт и возврат — «хлоп» на место
     "step": lambda x: 0.0 if x < 1 else 1.0,  # мгновенная перекладка
+    "spring": lambda x: 1 - math.exp(-6.5 * x) * math.cos(15 * x),  # затухающее покачивание (перелёт и возврат)
 }
 
 
@@ -99,6 +101,28 @@ def sample_keys(keys, t, prop, default):
 # --------------------------------------------------------------------------
 # Ассеты: загрузка, бумажная кромка, тень
 # --------------------------------------------------------------------------
+
+def photo_look(img, look, seed):
+    """Единый «печатный» вид для вырезок из разных генераций: цвет, контраст, зерно бумаги, потемнение у кромки."""
+    a = img.getchannel("A")
+    rgb = img.convert("RGB")
+    rgb = ImageEnhance.Color(rgb).enhance(look.get("sat", 1.0))
+    rgb = ImageEnhance.Contrast(rgb).enhance(look.get("contrast", 1.0))
+    arr = np.asarray(rgb).astype(np.float32)
+    rng = np.random.default_rng(seed)
+    if look.get("noise"):
+        arr += rng.normal(0, look["noise"], arr.shape[:2])[..., None]
+    if look.get("fibre"):      # крупное «волокно» бумаги
+        fib = ndimage.gaussian_filter(rng.normal(0, 1, arr.shape[:2]), 2.2)
+        arr *= (1 + look["fibre"] * fib / (fib.std() + 1e-6))[..., None]
+    if look.get("edge_darken"):
+        dist = ndimage.distance_transform_edt(np.asarray(a) > 128)
+        k = np.clip(1 - dist / look.get("edge_width", 9), 0, 1) * look["edge_darken"]
+        arr *= (1 - k)[..., None]
+    out = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+    out.putalpha(a)
+    return out
+
 
 @dataclass
 class Asset:
@@ -134,15 +158,27 @@ class AssetBank:
         edge = 0 if is_bg else d.get("edge", self.style.get("edge", 6))
         blur = self.style.get("shadow_blur", 10)
         pad = 0 if is_bg else edge + blur * 2 + 2
+        seed = zlib.crc32(name.encode())
+        look = self.style.get("photo_look")
+        if look and not is_bg:
+            img = photo_look(img, look, seed)
         if pad:
             canvas = Image.new("RGBA", (img.width + pad * 2, img.height + pad * 2), (0, 0, 0, 0))
             canvas.paste(img, (pad, pad))
             img = canvas
         a = img.getchannel("A")
         if edge:
-            # белая бумажная кромка: расширенная альфа под картинкой
-            grown = a.filter(ImageFilter.MaxFilter(edge * 2 + 1))
-            grown = grown.filter(ImageFilter.GaussianBlur(0.8))
+            # бумажная кромка: «вырезано ножницами» — ширина слегка гуляет вдоль контура
+            scissor = self.style.get("scissor", 0.35)
+            if scissor:
+                rng = np.random.default_rng(seed)
+                outside = ndimage.distance_transform_edt(np.asarray(a) < 40)
+                low = ndimage.gaussian_filter(rng.normal(0, 1, outside.shape), 9)
+                low = low / (low.std() + 1e-6)
+                width = edge * np.clip(1 + scissor * low, 0.45, 1.8)
+                grown = Image.fromarray(((outside <= width) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8))
+            else:
+                grown = a.filter(ImageFilter.MaxFilter(edge * 2 + 1)).filter(ImageFilter.GaussianBlur(0.8))
             paper = Image.new("RGBA", img.size, tuple(self.style.get("edge_color", [250, 248, 240])) + (0,))
             paper.putalpha(grown)
             paper.alpha_composite(img)
@@ -218,6 +254,19 @@ def in_ranges(t, ranges):
     return False
 
 
+@lru_cache(maxsize=128)
+def blink_schedule(key, lo, hi, tmax=240.0):
+    """Детерминированное расписание морганий для слоя (иногда — двойное)."""
+    rnd = random.Random(zlib.crc32(key.encode()))
+    t, out = rnd.uniform(0.6, lo), []
+    while t < tmax:
+        out.append(t)
+        if rnd.random() < 0.18:
+            out.append(t + 0.3)
+        t += rnd.uniform(lo, hi)
+    return tuple(out)
+
+
 def layer_state(layer, t, step, ctx):
     """Возвращает (asset_name, local_matrix) или None, если слой скрыт."""
     if "show" in layer and not in_ranges(t, layer["show"]):
@@ -227,6 +276,21 @@ def layer_state(layer, t, step, ctx):
     rot = sample_keys(keys, t, "rot", layer.get("rot", 0.0))
     scale = sample_keys(keys, t, "scale", layer.get("scale", 1.0))
     flip = layer.get("flip", False)
+
+    # «дыхание» и покачивание: sin по ступенчатому времени, чтобы кукла не замирала между репликами
+    # idle: {"rot":[амплитуда°, период с, фаза], "pos":[ax, ay, период, фаза], "breath":[амплитуда, период, фаза]}
+    breath = 1.0
+    idle = layer.get("idle")
+    if idle:
+        def sw(amp, period, ph=0.0):
+            return amp * math.sin(2 * math.pi * (t / period + ph))
+        if "rot" in idle:
+            rot = rot + sw(*idle["rot"])
+        if "pos" in idle:
+            ax_, ay_, per, ph = idle["pos"]
+            pos = [pos[0] + sw(ax_, per, ph), pos[1] + sw(ay_, per, ph)]
+        if "breath" in idle:
+            breath = 1 + sw(*idle["breath"])
 
     # подмена картинки (эмоции, позы рук): [{"t":1.2,"asset":"gosha_head_shock"}]
     asset_name = layer.get("asset")
@@ -262,6 +326,14 @@ def layer_state(layer, t, step, ctx):
             pos = [pos[0] + talk.get("dx", 0) * open_amt, pos[1] + talk.get("dy", 18) * open_amt]
             rot = rot + talk.get("drot", 0) * open_amt
 
+    # моргание: blink = {"map": {"голова": "голова_с_закрытыми_глазами"}, "every": [2.4, 5.5], "dur": 0.16}
+    blink = layer.get("blink")
+    if blink and asset_name in blink.get("map", {}):
+        lo, hi = blink.get("every", [2.4, 5.5])
+        d = blink.get("dur", 0.16)
+        if any(b <= t < b + d for b in blink_schedule(layer.get("id", "x"), lo, hi)):
+            asset_name = blink["map"][asset_name]
+
     # «вскок» — появление с перелётом
     if "pop" in layer:
         t0 = layer["pop"]
@@ -278,6 +350,8 @@ def layer_state(layer, t, step, ctx):
     apy = ay * asset.src_size[1]
     sx = scale if not isinstance(scale, list) else scale[0]
     sy = scale if not isinstance(scale, list) else scale[1]
+    sy *= breath
+    sx *= 1 - (breath - 1) * 0.5
     if flip:
         sx = -sx
     M = (m_translate(pos[0] + jx, pos[1] + jy) @ m_rotate(rot + jr) @ m_scale(sx, sy)
@@ -358,7 +432,7 @@ def world_matrices(shot, t, step, ctx):
 # Риги: персонаж = набор деталей, в сцене ставится одной строкой
 # --------------------------------------------------------------------------
 
-ROOT_KEYS = ("pos", "scale", "rot", "keys", "flip", "show", "pop", "boil")
+ROOT_KEYS = ("pos", "scale", "rot", "keys", "flip", "show", "pop", "boil", "idle")
 
 
 def expand_rigs(scene):
@@ -394,7 +468,7 @@ def expand_rigs(scene):
             for p in rig["parts"]:
                 part = {k: v for k, v in p.items() if k not in ("part", "root", "parent", "z")}
                 part.update(over.get(p["part"], {}))
-                part["z"] = z0 + p.get("z", 0) * 0.01
+                part["z"] = z0 + over.get(p["part"], {}).get("z", p.get("z", 0)) * 0.01
                 if p.get("root"):
                     part["id"] = iid
                     for k in ROOT_KEYS:
@@ -402,6 +476,7 @@ def expand_rigs(scene):
                             part[k] = l[k]
                 else:
                     part["id"] = f"{iid}.{p['part']}"
+                    part.setdefault("boil", rig.get("part_boil", 0.4))   # детали одной куклы дрожат слабее корня
                     par = p.get("parent", root)
                     part["parent"] = iid if par == root else f"{iid}.{par}"
                 out.append(part)

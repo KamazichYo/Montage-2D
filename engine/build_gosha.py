@@ -372,15 +372,22 @@ def main():
 
     rig = {
         "talk_part": "head",
+        "part_boil": 0.4,
         "talk": {"dy": 0, "mid_asset": "gosha_head_t_mid", "open_asset": "gosha_head_t_open"},
         "parts": [
             {"part": "legs", "asset": "gosha_legs", "anchor": [0.5, 1.0], "root": True, "z": -2},
-            {"part": "torso", "asset": "gosha_torso", "parent": "legs", "at": legs_at, "anchor": torso_anchor, "z": 0},
-            {"part": "hand_a", "asset": "gosha_hand_relaxed_a", "parent": "sleeve_a", "at": cuff_at, "anchor": hand_anchor_a, "z": 0.5},
-            {"part": "hand_b", "asset": "gosha_hand_relaxed_b", "parent": "sleeve_b", "at": cuff_at_b, "anchor": hand_anchor_b, "z": 0.5},
-            {"part": "sleeve_a", "asset": "gosha_sleeve_a", "parent": "torso", "at": torso_pt(SHOULDER_L), "anchor": sleeve_anchor, "rot": 2, "z": 1},
-            {"part": "sleeve_b", "asset": "gosha_sleeve_b", "parent": "torso", "at": torso_pt(SHOULDER_R), "anchor": sleeve_anchor_b, "rot": -2, "z": 1},
-            {"part": "head", "asset": "gosha_head_neutral", "parent": "torso", "at": torso_pt(V_TIP_TORSO), "anchor": head_anchor, "z": 2},
+            {"part": "torso", "asset": "gosha_torso", "parent": "legs", "at": legs_at, "anchor": torso_anchor, "z": 0,
+             "idle": {"breath": [0.006, 3.4, 0.0]}},
+            # рукава и кисти — ПОД торсом: плечо читается как плечо, а не накладка поверх груди;
+            # чтобы рука легла поверх торса, задайте в сцене parts.sleeve_x.z = 1
+            {"part": "hand_a", "asset": "gosha_hand_relaxed_a", "parent": "sleeve_a", "at": cuff_at, "anchor": hand_anchor_a, "z": -0.6},
+            {"part": "hand_b", "asset": "gosha_hand_relaxed_b", "parent": "sleeve_b", "at": cuff_at_b, "anchor": hand_anchor_b, "z": -0.6},
+            {"part": "sleeve_a", "asset": "gosha_sleeve_a", "parent": "torso", "at": torso_pt(SHOULDER_L), "anchor": sleeve_anchor,
+             "rot": 2, "z": -0.5, "idle": {"rot": [1.6, 3.7, 0.1]}},
+            {"part": "sleeve_b", "asset": "gosha_sleeve_b", "parent": "torso", "at": torso_pt(SHOULDER_R), "anchor": sleeve_anchor_b,
+             "rot": -2, "z": -0.5, "idle": {"rot": [1.6, 3.7, 0.6]}},
+            {"part": "head", "asset": "gosha_head_neutral", "parent": "torso", "at": torso_pt(V_TIP_TORSO), "anchor": head_anchor, "z": 2,
+             "idle": {"rot": [1.3, 4.3, 0.25]}},
         ],
     }
     assets = {n: f"chars/gosha/parts/{n}.png" for n in ("gosha_torso", "gosha_legs", "gosha_sleeve_a", "gosha_sleeve_b")}
@@ -407,7 +414,8 @@ def write_test_scene(rig, assets):
     sc = {
         "title": "Тест марионетки Гоши", "size": [1080, 1920], "fps": 24, "anim_fps": 12, "asset_root": "../assets",
         "style": {"edge": 6, "boil": 0.0, "camera_boil": 0, "shadow_blur": 10, "shadow_offset": [10, 14],
-                  "shadow_opacity": 0.4, "grain": 0, "flicker": 0, "vignette": 0},
+                  "shadow_opacity": 0.4, "grain": 0, "flicker": 0, "vignette": 0,
+                  "photo_look": {"sat": 0.94, "contrast": 1.05, "noise": 3, "fibre": 0.012, "edge_darken": 0.08}},
         "assets": assets, "rigs": {"gosha": rig},
         "shots": [
             shot(),
