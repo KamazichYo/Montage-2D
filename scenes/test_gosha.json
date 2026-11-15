@@ -1,0 +1,219 @@
+{
+ "title": "Тест марионетки Гоши",
+ "size": [
+  1080,
+  1920
+ ],
+ "fps": 24,
+ "anim_fps": 12,
+ "asset_root": "../assets",
+ "style": {
+  "edge": 6,
+  "boil": 0.8,
+  "camera_boil": 0,
+  "shadow_blur": 10,
+  "shadow_offset": [
+   10,
+   14
+  ],
+  "shadow_opacity": 0.4,
+  "grain": 0,
+  "flicker": 0,
+  "vignette": 0
+ },
+ "assets": {
+  "gosha_torso": "chars/gosha/parts/gosha_torso.png",
+  "gosha_arm_l": "chars/gosha/parts/gosha_arm_l.png",
+  "gosha_arm_r": "chars/gosha/parts/gosha_arm_r.png",
+  "gosha_legs": "chars/gosha/parts/gosha_legs.png",
+  "gosha_head_neutral": {
+   "file": "chars/gosha/parts/gosha_head_neutral.png",
+   "trim": false
+  },
+  "gosha_head_smug": {
+   "file": "chars/gosha/parts/gosha_head_smug.png",
+   "trim": false
+  },
+  "gosha_head_shock": {
+   "file": "chars/gosha/parts/gosha_head_shock.png",
+   "trim": false
+  },
+  "gosha_head_blank": {
+   "file": "chars/gosha/parts/gosha_head_blank.png",
+   "trim": false
+  },
+  "gosha_head_panic": {
+   "file": "chars/gosha/parts/gosha_head_panic.png",
+   "trim": false
+  },
+  "gosha_head_proud": {
+   "file": "chars/gosha/parts/gosha_head_proud.png",
+   "trim": false
+  }
+ },
+ "rigs": {
+  "gosha": {
+   "talk": {
+    "dy": 22
+   },
+   "parts": [
+    {
+     "part": "legs",
+     "asset": "gosha_legs",
+     "anchor": [
+      0.5,
+      1.0
+     ],
+     "root": true,
+     "z": -2
+    },
+    {
+     "part": "torso",
+     "asset": "gosha_torso",
+     "parent": "legs",
+     "at": [
+      0.4920212765957447,
+      0.026954177897574125
+     ],
+     "anchor": [
+      0.46984924623115576,
+      0.9947552447552448
+     ],
+     "z": 0
+    },
+    {
+     "part": "arm_l",
+     "asset": "gosha_arm_l",
+     "parent": "torso",
+     "at": [
+      0.03768844221105527,
+      0.2666083916083916
+     ],
+     "anchor": [
+      0.910828025477707,
+      0.06261859582542695
+     ],
+     "rot": -26,
+     "z": 1
+    },
+    {
+     "part": "arm_r",
+     "asset": "gosha_arm_r",
+     "parent": "torso",
+     "at": [
+      0.9547738693467337,
+      0.2666083916083916
+     ],
+     "anchor": [
+      0.0915032679738562,
+      0.06928838951310862
+     ],
+     "rot": 26,
+     "z": 1
+    },
+    {
+     "part": "head",
+     "asset": "gosha_head_neutral",
+     "parent": "torso",
+     "at": [
+      0.4899497487437186,
+      0.13024475524475523
+     ],
+     "anchor": [
+      0.49167377095765846,
+      0.999507681860623
+     ],
+     "z": 2
+    }
+   ]
+  }
+ },
+ "shots": [
+  {
+   "dur": 1,
+   "fill": [
+    150,
+    150,
+    150
+   ],
+   "layers": [
+    {
+     "id": "g",
+     "rig": "gosha",
+     "pos": [
+      540,
+      1840
+     ],
+     "scale": 1.0
+    }
+   ]
+  },
+  {
+   "dur": 1,
+   "fill": [
+    150,
+    150,
+    150
+   ],
+   "layers": [
+    {
+     "id": "g",
+     "rig": "gosha",
+     "pos": [
+      540,
+      1840
+     ],
+     "scale": 1.0,
+     "face": [
+      {
+       "t": 0,
+       "asset": "gosha_head_shock"
+      }
+     ],
+     "parts": {
+      "arm_l": {
+       "rot": 105
+      },
+      "arm_r": {
+       "rot": -40
+      }
+     }
+    }
+   ]
+  },
+  {
+   "dur": 1,
+   "fill": [
+    150,
+    150,
+    150
+   ],
+   "layers": [
+    {
+     "id": "g",
+     "rig": "gosha",
+     "pos": [
+      540,
+      1840
+     ],
+     "scale": 1.0,
+     "rot": 6,
+     "face": [
+      {
+       "t": 0,
+       "asset": "gosha_head_smug"
+      }
+     ],
+     "parts": {
+      "arm_l": {
+       "rot": -5
+      },
+      "arm_r": {
+       "rot": 70
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

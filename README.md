@@ -24,6 +24,13 @@ python3 engine/voice.py scenes/ep01_pilot.json                # черновая
 python3 engine/cutout.py scenes/ep01_pilot.json -o out/ep01.mp4
 ```
 
+Собрать марионетку Гоши из сгенерированных деталей и посмотреть тестовую сцену:
+
+```bash
+python3 engine/build_gosha.py
+python3 engine/cutout.py scenes/test_gosha.json --still 1.5 -o out/test.png
+```
+
 Вырезать сгенерированные картинки:
 
 ```bash
