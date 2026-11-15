@@ -254,8 +254,11 @@ def layer_state(layer, t, step, ctx):
             # каждый третий шаг рот закрыт, остальные — случайная степень открытия
             open_amt = rnd.choice([0.0, 0.6, 1.0, 1.0]) if tick % 3 != 0 else 0.0
         if open_amt:
-            if "open_asset" in talk and open_amt > 0.5:
+            # подмена головы по громкости: слегка открыт → mid_asset, широко → open_asset
+            if open_amt > 0.8 and "open_asset" in talk:
                 asset_name = talk["open_asset"]
+            elif open_amt > 0.3 and ("mid_asset" in talk or "open_asset" in talk):
+                asset_name = talk.get("mid_asset", talk.get("open_asset"))
             pos = [pos[0] + talk.get("dx", 0) * open_amt, pos[1] + talk.get("dy", 18) * open_amt]
             rot = rot + talk.get("drot", 0) * open_amt
 
@@ -371,18 +374,19 @@ def expand_rigs(scene):
             z0 = l.get("z", i)
             root = next(p["part"] for p in rig["parts"] if p.get("root"))
             over = dict(l.get("parts", {}))
-            if "say" in l:   # [[t0,t1],...] — когда говорит (челюсть хлопает)
-                jaw = dict(over.get("jaw", {}))
+            tp = rig.get("talk_part", "jaw")     # какая деталь «говорит»: jaw (челюсть) или head (подмена головы)
+            if "say" in l:   # [[t0,t1],...] — когда говорит (хлопушка)
+                jaw = dict(over.get(tp, {}))
                 talk = dict(rig.get("talk", {}))
                 talk["ranges"] = l["say"]
                 jaw["talk"] = talk
-                over["jaw"] = jaw
-            if "say_env" in l:   # из dialogue: челюсть по громкости аудио
-                jaw = dict(over.get("jaw", {}))
+                over[tp] = jaw
+            if "say_env" in l:   # из dialogue: по громкости аудио
+                jaw = dict(over.get(tp, {}))
                 talk = dict(jaw.get("talk", rig.get("talk", {})))
                 talk["env"] = l["say_env"]
                 jaw["talk"] = talk
-                over["jaw"] = jaw
+                over[tp] = jaw
             if "face" in l:  # [{"t":1.0,"asset":"x_head_shock"}] — смена эмоции
                 head = dict(over.get("head", {}))
                 head["swap"] = l["face"]

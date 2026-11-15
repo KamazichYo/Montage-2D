@@ -1,7 +1,10 @@
 {
  "rig": {
+  "talk_part": "head",
   "talk": {
-   "dy": 22
+   "dy": 0,
+   "mid_asset": "gosha_head_t_mid",
+   "open_asset": "gosha_head_t_open"
   },
   "parts": [
    {
@@ -29,33 +32,61 @@
     "z": 0
    },
    {
-    "part": "arm_l",
-    "asset": "gosha_arm_l",
-    "parent": "torso",
+    "part": "hand_a",
+    "asset": "gosha_hand_relaxed_a",
+    "parent": "sleeve_a",
     "at": [
-     0.03768844221105527,
-     0.2666083916083916
+     0.39556962025316456,
+     0.9689849624060151
     ],
     "anchor": [
-     0.910828025477707,
-     0.06261859582542695
+     0.5852272727272727,
+     0.05249343832020997
     ],
-    "rot": -16,
+    "z": 0.5
+   },
+   {
+    "part": "hand_b",
+    "asset": "gosha_hand_relaxed_b",
+    "parent": "sleeve_b",
+    "at": [
+     0.6044303797468354,
+     0.9689849624060151
+    ],
+    "anchor": [
+     0.4147727272727273,
+     0.05249343832020997
+    ],
+    "z": 0.5
+   },
+   {
+    "part": "sleeve_a",
+    "asset": "gosha_sleeve_a",
+    "parent": "torso",
+    "at": [
+     0.04396984924623116,
+     0.26223776223776224
+    ],
+    "anchor": [
+     0.5838607594936709,
+     0.10338345864661654
+    ],
+    "rot": 2,
     "z": 1
    },
    {
-    "part": "arm_r",
-    "asset": "gosha_arm_r",
+    "part": "sleeve_b",
+    "asset": "gosha_sleeve_b",
     "parent": "torso",
     "at": [
-     0.9547738693467337,
-     0.2666083916083916
+     0.9484924623115578,
+     0.26223776223776224
     ],
     "anchor": [
-     0.0915032679738562,
-     0.06928838951310862
+     0.4161392405063291,
+     0.10338345864661654
     ],
-    "rot": 16,
+    "rot": -2,
     "z": 1
    },
    {
@@ -67,8 +98,8 @@
      0.13024475524475523
     ],
     "anchor": [
-     0.49540320462306275,
-     0.9972552701831906
+     0.4954491369585709,
+     0.9990210073959312
     ],
     "z": 2
    }
@@ -76,9 +107,9 @@
  },
  "assets": {
   "gosha_torso": "chars/gosha/parts/gosha_torso.png",
-  "gosha_arm_l": "chars/gosha/parts/gosha_arm_l.png",
-  "gosha_arm_r": "chars/gosha/parts/gosha_arm_r.png",
   "gosha_legs": "chars/gosha/parts/gosha_legs.png",
+  "gosha_sleeve_a": "chars/gosha/parts/gosha_sleeve_a.png",
+  "gosha_sleeve_b": "chars/gosha/parts/gosha_sleeve_b.png",
   "gosha_head_neutral": {
    "file": "chars/gosha/parts/gosha_head_neutral.png",
    "trim": false
@@ -101,6 +132,102 @@
   },
   "gosha_head_proud": {
    "file": "chars/gosha/parts/gosha_head_proud.png",
+   "trim": false
+  },
+  "gosha_head_t_closed": {
+   "file": "chars/gosha/parts/gosha_head_t_closed.png",
+   "trim": false
+  },
+  "gosha_head_t_mid": {
+   "file": "chars/gosha/parts/gosha_head_t_mid.png",
+   "trim": false
+  },
+  "gosha_head_t_open": {
+   "file": "chars/gosha/parts/gosha_head_t_open.png",
+   "trim": false
+  },
+  "gosha_head_shout": {
+   "file": "chars/gosha/parts/gosha_head_shout.png",
+   "trim": false
+  },
+  "gosha_head_laugh": {
+   "file": "chars/gosha/parts/gosha_head_laugh.png",
+   "trim": false
+  },
+  "gosha_head_oh": {
+   "file": "chars/gosha/parts/gosha_head_oh.png",
+   "trim": false
+  },
+  "gosha_hand_relaxed_a": {
+   "file": "chars/gosha/parts/gosha_hand_relaxed_a.png",
+   "trim": false
+  },
+  "gosha_hand_relaxed_b": {
+   "file": "chars/gosha/parts/gosha_hand_relaxed_b.png",
+   "trim": false
+  },
+  "gosha_hand_wave_a": {
+   "file": "chars/gosha/parts/gosha_hand_wave_a.png",
+   "trim": false
+  },
+  "gosha_hand_wave_b": {
+   "file": "chars/gosha/parts/gosha_hand_wave_b.png",
+   "trim": false
+  },
+  "gosha_hand_fist_a": {
+   "file": "chars/gosha/parts/gosha_hand_fist_a.png",
+   "trim": false
+  },
+  "gosha_hand_fist_b": {
+   "file": "chars/gosha/parts/gosha_hand_fist_b.png",
+   "trim": false
+  },
+  "gosha_hand_point_a": {
+   "file": "chars/gosha/parts/gosha_hand_point_a.png",
+   "trim": false
+  },
+  "gosha_hand_point_b": {
+   "file": "chars/gosha/parts/gosha_hand_point_b.png",
+   "trim": false
+  },
+  "gosha_hand_thumb_a": {
+   "file": "chars/gosha/parts/gosha_hand_thumb_a.png",
+   "trim": false
+  },
+  "gosha_hand_thumb_b": {
+   "file": "chars/gosha/parts/gosha_hand_thumb_b.png",
+   "trim": false
+  },
+  "gosha_hand_beg_a": {
+   "file": "chars/gosha/parts/gosha_hand_beg_a.png",
+   "trim": false
+  },
+  "gosha_hand_beg_b": {
+   "file": "chars/gosha/parts/gosha_hand_beg_b.png",
+   "trim": false
+  },
+  "gosha_hand_pinch_a": {
+   "file": "chars/gosha/parts/gosha_hand_pinch_a.png",
+   "trim": false
+  },
+  "gosha_hand_pinch_b": {
+   "file": "chars/gosha/parts/gosha_hand_pinch_b.png",
+   "trim": false
+  },
+  "gosha_hand_facepalm_a": {
+   "file": "chars/gosha/parts/gosha_hand_facepalm_a.png",
+   "trim": false
+  },
+  "gosha_hand_facepalm_b": {
+   "file": "chars/gosha/parts/gosha_hand_facepalm_b.png",
+   "trim": false
+  },
+  "gosha_hand_claw_a": {
+   "file": "chars/gosha/parts/gosha_hand_claw_a.png",
+   "trim": false
+  },
+  "gosha_hand_claw_b": {
+   "file": "chars/gosha/parts/gosha_hand_claw_b.png",
    "trim": false
   }
  }

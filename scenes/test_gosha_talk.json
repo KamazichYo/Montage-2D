@@ -1,0 +1,311 @@
+{
+ "title": "Тест: говорящий Гоша",
+ "size": [
+  1080,
+  1920
+ ],
+ "fps": 24,
+ "anim_fps": 12,
+ "asset_root": "../assets",
+ "style": {
+  "edge": 6,
+  "boil": 1.0,
+  "camera_boil": 0,
+  "shadow_blur": 10,
+  "shadow_offset": [
+   10,
+   14
+  ],
+  "shadow_opacity": 0.4,
+  "grain": 5,
+  "flicker": 0,
+  "vignette": 0.25,
+  "captions": {
+   "size": 58,
+   "y": 1500,
+   "stroke": 7
+  }
+ },
+ "assets": {
+  "gosha_torso": "chars/gosha/parts/gosha_torso.png",
+  "gosha_legs": "chars/gosha/parts/gosha_legs.png",
+  "gosha_sleeve_a": "chars/gosha/parts/gosha_sleeve_a.png",
+  "gosha_sleeve_b": "chars/gosha/parts/gosha_sleeve_b.png",
+  "gosha_head_neutral": {
+   "file": "chars/gosha/parts/gosha_head_neutral.png",
+   "trim": false
+  },
+  "gosha_head_smug": {
+   "file": "chars/gosha/parts/gosha_head_smug.png",
+   "trim": false
+  },
+  "gosha_head_shock": {
+   "file": "chars/gosha/parts/gosha_head_shock.png",
+   "trim": false
+  },
+  "gosha_head_blank": {
+   "file": "chars/gosha/parts/gosha_head_blank.png",
+   "trim": false
+  },
+  "gosha_head_panic": {
+   "file": "chars/gosha/parts/gosha_head_panic.png",
+   "trim": false
+  },
+  "gosha_head_proud": {
+   "file": "chars/gosha/parts/gosha_head_proud.png",
+   "trim": false
+  },
+  "gosha_head_t_closed": {
+   "file": "chars/gosha/parts/gosha_head_t_closed.png",
+   "trim": false
+  },
+  "gosha_head_t_mid": {
+   "file": "chars/gosha/parts/gosha_head_t_mid.png",
+   "trim": false
+  },
+  "gosha_head_t_open": {
+   "file": "chars/gosha/parts/gosha_head_t_open.png",
+   "trim": false
+  },
+  "gosha_head_shout": {
+   "file": "chars/gosha/parts/gosha_head_shout.png",
+   "trim": false
+  },
+  "gosha_head_laugh": {
+   "file": "chars/gosha/parts/gosha_head_laugh.png",
+   "trim": false
+  },
+  "gosha_head_oh": {
+   "file": "chars/gosha/parts/gosha_head_oh.png",
+   "trim": false
+  },
+  "gosha_hand_relaxed_a": {
+   "file": "chars/gosha/parts/gosha_hand_relaxed_a.png",
+   "trim": false
+  },
+  "gosha_hand_relaxed_b": {
+   "file": "chars/gosha/parts/gosha_hand_relaxed_b.png",
+   "trim": false
+  },
+  "gosha_hand_wave_a": {
+   "file": "chars/gosha/parts/gosha_hand_wave_a.png",
+   "trim": false
+  },
+  "gosha_hand_wave_b": {
+   "file": "chars/gosha/parts/gosha_hand_wave_b.png",
+   "trim": false
+  },
+  "gosha_hand_fist_a": {
+   "file": "chars/gosha/parts/gosha_hand_fist_a.png",
+   "trim": false
+  },
+  "gosha_hand_fist_b": {
+   "file": "chars/gosha/parts/gosha_hand_fist_b.png",
+   "trim": false
+  },
+  "gosha_hand_point_a": {
+   "file": "chars/gosha/parts/gosha_hand_point_a.png",
+   "trim": false
+  },
+  "gosha_hand_point_b": {
+   "file": "chars/gosha/parts/gosha_hand_point_b.png",
+   "trim": false
+  },
+  "gosha_hand_thumb_a": {
+   "file": "chars/gosha/parts/gosha_hand_thumb_a.png",
+   "trim": false
+  },
+  "gosha_hand_thumb_b": {
+   "file": "chars/gosha/parts/gosha_hand_thumb_b.png",
+   "trim": false
+  },
+  "gosha_hand_beg_a": {
+   "file": "chars/gosha/parts/gosha_hand_beg_a.png",
+   "trim": false
+  },
+  "gosha_hand_beg_b": {
+   "file": "chars/gosha/parts/gosha_hand_beg_b.png",
+   "trim": false
+  },
+  "gosha_hand_pinch_a": {
+   "file": "chars/gosha/parts/gosha_hand_pinch_a.png",
+   "trim": false
+  },
+  "gosha_hand_pinch_b": {
+   "file": "chars/gosha/parts/gosha_hand_pinch_b.png",
+   "trim": false
+  },
+  "gosha_hand_facepalm_a": {
+   "file": "chars/gosha/parts/gosha_hand_facepalm_a.png",
+   "trim": false
+  },
+  "gosha_hand_facepalm_b": {
+   "file": "chars/gosha/parts/gosha_hand_facepalm_b.png",
+   "trim": false
+  },
+  "gosha_hand_claw_a": {
+   "file": "chars/gosha/parts/gosha_hand_claw_a.png",
+   "trim": false
+  },
+  "gosha_hand_claw_b": {
+   "file": "chars/gosha/parts/gosha_hand_claw_b.png",
+   "trim": false
+  }
+ },
+ "rigs": {
+  "gosha": {
+   "talk_part": "head",
+   "talk": {
+    "dy": 0,
+    "mid_asset": "gosha_head_t_mid",
+    "open_asset": "gosha_head_t_open"
+   },
+   "parts": [
+    {
+     "part": "legs",
+     "asset": "gosha_legs",
+     "anchor": [
+      0.5,
+      1.0
+     ],
+     "root": true,
+     "z": -2
+    },
+    {
+     "part": "torso",
+     "asset": "gosha_torso",
+     "parent": "legs",
+     "at": [
+      0.4920212765957447,
+      0.026954177897574125
+     ],
+     "anchor": [
+      0.46984924623115576,
+      0.9947552447552448
+     ],
+     "z": 0
+    },
+    {
+     "part": "hand_a",
+     "asset": "gosha_hand_relaxed_a",
+     "parent": "sleeve_a",
+     "at": [
+      0.39556962025316456,
+      0.9689849624060151
+     ],
+     "anchor": [
+      0.5852272727272727,
+      0.05249343832020997
+     ],
+     "z": 0.5
+    },
+    {
+     "part": "hand_b",
+     "asset": "gosha_hand_relaxed_b",
+     "parent": "sleeve_b",
+     "at": [
+      0.6044303797468354,
+      0.9689849624060151
+     ],
+     "anchor": [
+      0.4147727272727273,
+      0.05249343832020997
+     ],
+     "z": 0.5
+    },
+    {
+     "part": "sleeve_a",
+     "asset": "gosha_sleeve_a",
+     "parent": "torso",
+     "at": [
+      0.04396984924623116,
+      0.26223776223776224
+     ],
+     "anchor": [
+      0.5838607594936709,
+      0.10338345864661654
+     ],
+     "rot": 2,
+     "z": 1
+    },
+    {
+     "part": "sleeve_b",
+     "asset": "gosha_sleeve_b",
+     "parent": "torso",
+     "at": [
+      0.9484924623115578,
+      0.26223776223776224
+     ],
+     "anchor": [
+      0.4161392405063291,
+      0.10338345864661654
+     ],
+     "rot": -2,
+     "z": 1
+    },
+    {
+     "part": "head",
+     "asset": "gosha_head_neutral",
+     "parent": "torso",
+     "at": [
+      0.4899497487437186,
+      0.13024475524475523
+     ],
+     "anchor": [
+      0.4954491369585709,
+      0.9990210073959312
+     ],
+     "z": 2
+    }
+   ]
+  }
+ },
+ "shots": [
+  {
+   "fill": [
+    150,
+    150,
+    150
+   ],
+   "tail": 0.5,
+   "dialogue": [
+    {
+     "who": "g",
+     "text": "Без единой строчки кода!"
+    }
+   ],
+   "layers": [
+    {
+     "id": "g",
+     "rig": "gosha",
+     "pos": [
+      540,
+      1800
+     ],
+     "scale": 1.0,
+     "parts": {
+      "sleeve_a": {
+       "rot": 20
+      },
+      "sleeve_b": {
+       "rot": -35
+      },
+      "hand_b": {
+       "asset": "gosha_hand_point_b"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "cast": {
+  "g": {
+   "name": "ГОША",
+   "color": [
+    255,
+    160,
+    60
+   ]
+  }
+ }
+}
