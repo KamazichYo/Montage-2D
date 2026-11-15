@@ -11,6 +11,7 @@
 | [`docs/05_prompt_pack.md`](docs/05_prompt_pack.md) | Готовые промты для первого видео: локации, герои, гости, реквизит |
 | [`docs/06_pilot_outside.md`](docs/06_pilot_outside.md) | Новый пилот «Выйти из Матрицы»: сценарий, рамка сериала, список персонажей |
 | [`docs/07_character_checklist.md`](docs/07_character_checklist.md) | Чек-лист генерации персонажей: шаги, правила, карточки героев |
+| [`docs/08_nbp_prompt_rules.md`](docs/08_nbp_prompt_rules.md) | Правила промтов для Nano Banana Pro и частей персонажа |
 | [`.claude/skills/montage-episode/SKILL.md`](.claude/skills/montage-episode/SKILL.md) | Скилл: как собирать серию и формат сцены |
 
 ## Быстрый старт

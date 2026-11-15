@@ -55,7 +55,8 @@ description: Собрать серию или короткий ролик сит
 
 ## Новые картинки
 
-- Промты — `docs/02_prompts.md`. Генерирует пользователь (Gemini / Flow), кладёт в `incoming/`.
+- Промты для Nano Banana Pro пишем по правилам из `docs/08_nbp_prompt_rules.md`; чек-лист героя — `docs/07_character_checklist.md`.
+- Старые промты — `docs/02_prompts.md`. Генерирует пользователь (Gemini / Flow), кладёт в `incoming/`.
 - Вырезка: `python3 engine/cut.py incoming/x.png -o assets/chars/gosha [--split] [--key]`.
 - Челюсть: `python3 engine/jaw.py assets/chars/gosha/gosha_head_neutral.png --mouth 0.74` → `_top.png` и `_jaw.png`.
 - Все головы одного героя приводи к одному размеру и одной линии рта — иначе при смене эмоции голова «прыгает» не по-смешному.
